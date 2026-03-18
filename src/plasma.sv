@@ -28,46 +28,38 @@ module plasma (
   logic [3:0] w3;
   logic [3:0] w4;
 
-  assign w1 = sin4(phase1);
-  assign w2 = sin4(phase2);
-  assign w3 = sin4(phase3);
-  assign w4 = sin4(phase4);
+  assign w1 = SIN_LUT[phase1];
+  assign w2 = SIN_LUT[phase2];
+  assign w3 = SIN_LUT[phase3];
+  assign w4 = SIN_LUT[phase4];
 
-  logic [6:0] plasma_sum;
-  assign plasma_sum = 6'(w1) + 6'(w2) + 6'(w3) + 6'(w4);
+  logic [4:0] plasma_sum;
+  assign plasma_sum = (w1 + w2) + (w3 + w4);
 
   // Color mapping
   logic [3:0] color_r_phase;
   logic [3:0] color_g_phase;
   logic [3:0] color_b_phase;
 
-  assign color_r_phase = sin4(plasma_sum[4:0] + counter[9:5]);
-  assign color_g_phase = sin4(plasma_sum[4:0] + counter[10:6] + 5'd10);
-  assign color_b_phase = sin4(plasma_sum[4:0] - counter[9:5] + 5'd20);
+  assign color_r_phase = SIN_LUT[plasma_sum[4:0] + counter[9:5]];
+  assign color_g_phase = SIN_LUT[plasma_sum[4:0] + counter[10:6] + 5'd10];
+  assign color_b_phase = SIN_LUT[plasma_sum[4:0] - counter[9:5] + 5'd20];
 
   assign plasma_r = color_r_phase[3:2];
   assign plasma_g = color_g_phase[3:2];
   assign plasma_b = color_b_phase[3:2];
 
   // Quantized Sine LUT
-  function automatic [3:0] sin4(input logic [4:0] phase);
-    case (phase)
-      5'd00: sin4 = 4'd8;  5'd01: sin4 = 4'd9;  5'd02: sin4 = 4'd10; 5'd03: sin4 = 4'd12;
-      5'd04: sin4 = 4'd13; 5'd05: sin4 = 4'd14; 5'd06: sin4 = 4'd14; 5'd07: sin4 = 4'd15;
-      5'd08: sin4 = 4'd15; 5'd09: sin4 = 4'd15; 5'd10: sin4 = 4'd14; 5'd11: sin4 = 4'd14;
-      5'd12: sin4 = 4'd13; 5'd13: sin4 = 4'd12; 5'd14: sin4 = 4'd10; 5'd15: sin4 = 4'd9;
-      5'd16: sin4 = 4'd8;  5'd17: sin4 = 4'd6;  5'd18: sin4 = 4'd5;  5'd19: sin4 = 4'd3;
-      5'd20: sin4 = 4'd2;  5'd21: sin4 = 4'd1;  5'd22: sin4 = 4'd1;  5'd23: sin4 = 4'd0;
-      5'd24: sin4 = 4'd0;  5'd25: sin4 = 4'd0;  5'd26: sin4 = 4'd1;  5'd27: sin4 = 4'd1;
-      5'd28: sin4 = 4'd2;  5'd29: sin4 = 4'd3;  5'd30: sin4 = 4'd5;  5'd31: sin4 = 4'd6;
-      default: sin4 = 4'd8; 
-    endcase
-  endfunction
+  localparam logic [3:0] SIN_LUT [0:31] = '{
+    4'd8, 4'd9, 4'd10, 4'd12, 4'd13, 4'd14, 4'd14, 4'd15,
+    4'd15, 4'd15, 4'd14, 4'd14, 4'd13, 4'd12, 4'd10, 4'd9,
+    4'd8, 4'd6, 4'd5, 4'd3, 4'd2, 4'd1, 4'd1, 4'd0,
+    4'd0, 4'd0, 4'd1, 4'd1, 4'd2, 4'd3, 4'd5, 4'd6
+  };
 
   // Recycle bin for unused variables
   wire _unused_ok = &{
     1'b0,
-    plasma_sum[6:5],
     color_r_phase[1:0],
     color_g_phase[1:0],
     color_b_phase[1:0],
