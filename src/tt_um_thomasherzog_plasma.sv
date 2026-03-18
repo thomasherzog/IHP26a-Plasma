@@ -26,6 +26,10 @@ module tt_um_thomasherzog_plasma (
   logic [9:0] pix_x;
   logic [9:0] pix_y;
 
+  // Control signals
+  logic show_about;
+  assign show_about = ui_in[7]; // Use the dedicated input to toggle the "ABOUT" screen
+
   // TinyVGA PMOD
   assign uo_out = {hsync, B[0], G[0], R[0], vsync, B[1], G[1], R[1]};
   assign uio_out = 0;
@@ -82,20 +86,16 @@ module tt_um_thomasherzog_plasma (
   end
 
   // Output
-  assign R = video_active ? (
-    is_inner ? 2'b11 :
-    is_border ? 2'b00 :
-    plasma_r
-  ) : 2'b00;
-  assign G = video_active ? (
-    is_inner ? 2'b11 :
-    is_border ? 2'b00 :
-    plasma_g
-  ) : 2'b00;
-  assign B = video_active ? (
-    is_inner ? 2'b11 :
-    is_border ? 2'b00 :
-    plasma_b
-  ) : 2'b00;
+  always_comb begin
+    if(!video_active) begin
+      {R, G, B} = 6'b000000;
+    end else if(show_about && is_inner) begin
+      {R, G, B} = 6'b111111;
+    end else if(show_about && is_border) begin
+      {R, G, B} = 6'b000000; 
+    end else begin
+      {R, G, B} = {plasma_r, plasma_g, plasma_b};
+    end
+  end
 
 endmodule
