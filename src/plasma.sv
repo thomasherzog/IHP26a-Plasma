@@ -50,12 +50,14 @@ module plasma (
   assign plasma_b = color_b_phase[3:2];
 
   // Quantized Sine LUT
-  localparam logic [3:0] SIN_LUT [0:31] = '{
+  // verilator lint_off ASCRANGE
+  localparam logic [0:31][3:0] SIN_LUT = {
     4'd8, 4'd9, 4'd10, 4'd12, 4'd13, 4'd14, 4'd14, 4'd15,
     4'd15, 4'd15, 4'd14, 4'd14, 4'd13, 4'd12, 4'd10, 4'd9,
     4'd8, 4'd6, 4'd5, 4'd3, 4'd2, 4'd1, 4'd1, 4'd0,
     4'd0, 4'd0, 4'd1, 4'd1, 4'd2, 4'd3, 4'd5, 4'd6
   };
+  // verilator lint_on ASCRANGE
 
   // Recycle bin for unused variables
   wire _unused_ok = &{
