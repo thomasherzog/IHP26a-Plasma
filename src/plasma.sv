@@ -3,10 +3,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+typedef enum logic [1:0] {
+    MODE_DEFAULT = 2'b00,
+    MODE_MATRIX = 2'b01,
+    MODE_CYBERPUNK = 2'b10,
+    MODE_ABYSS = 2'b11
+} plasma_mode_t;
+
 module plasma (
     input logic [9:0] hpos,
     input logic [9:0] vpos,
     input logic [11:0] counter,
+    input logic [1:0] mode,
     output logic [1:0] plasma_r,
     output logic [1:0] plasma_g,
     output logic [1:0] plasma_b
@@ -41,9 +49,35 @@ module plasma (
   logic [3:0] color_g_phase;
   logic [3:0] color_b_phase;
 
-  assign color_r_phase = sin4(plasma_sum[4:0] + counter[9:5]);
-  assign color_g_phase = sin4(plasma_sum[4:0] + counter[10:6] + 5'd10);
-  assign color_b_phase = sin4(plasma_sum[4:0] - counter[9:5] + 5'd20);
+  always_comb begin
+    case (mode)
+      MODE_DEFAULT: begin
+        color_r_phase = sin4(plasma_sum + counter[9:5]);
+        color_g_phase = sin4(plasma_sum+ counter[10:6] + 5'd10);
+        color_b_phase = sin4(plasma_sum - counter[9:5] + 5'd20);
+      end
+      MODE_MATRIX: begin
+        color_g_phase = sin4(plasma_sum);
+        color_r_phase = color_g_phase >> 2;
+        color_b_phase = color_g_phase >> 2;
+      end
+      MODE_CYBERPUNK: begin
+        color_r_phase = sin4(plasma_sum + counter[8:4]);
+        color_g_phase = sin4(plasma_sum + 5'd16);
+        color_b_phase = 4'd12;
+      end
+      MODE_ABYSS: begin
+        color_r_phase = (plasma_sum > 5'd28) ? 4'd12 : 4'd0; 
+        color_g_phase = (plasma_sum > 5'd24) ? plasma_sum[4:1] : 4'd2;
+        color_b_phase = plasma_sum[4:1];
+      end
+      default: begin
+        color_r_phase = sin4(plasma_sum + counter[9:5]);
+        color_g_phase = sin4(plasma_sum + counter[10:6] + 5'd10);
+        color_b_phase = sin4(plasma_sum - counter[9:5] + 5'd20);
+      end
+    endcase
+  end
 
   assign plasma_r = color_r_phase[3:2];
   assign plasma_g = color_g_phase[3:2];

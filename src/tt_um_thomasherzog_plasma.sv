@@ -30,6 +30,9 @@ module tt_um_thomasherzog_plasma (
   logic show_about;
   assign show_about = ui_in[7]; // Use the dedicated input to toggle the "ABOUT" screen
 
+  logic [1:0] mode;
+  assign mode = ui_in[1:0];
+
   // TinyVGA PMOD
   assign uo_out = {hsync, B[0], G[0], R[0], vsync, B[1], G[1], R[1]};
   assign uio_out = 0;
@@ -57,6 +60,7 @@ module tt_um_thomasherzog_plasma (
     .hpos(pix_x),
     .vpos(pix_y),
     .counter(counter_q),
+    .mode(mode),
     .plasma_r(plasma_r),
     .plasma_g(plasma_g),
     .plasma_b(plasma_b)
