@@ -58,6 +58,17 @@ module tt_um_plasmanim (
     .plasma_b(plasma_b)
   );
 
+  // Text renderer
+  logic is_inner;
+  logic is_border;
+
+  text_renderer text_gen(
+    .hpos(pix_x),
+    .vpos(pix_y),
+    .is_inner(is_inner),
+    .is_border(is_border)
+  );
+
   // Counter
   logic [11:0] counter_d, counter_q;
   assign counter_d = counter_q;
@@ -71,8 +82,20 @@ module tt_um_plasmanim (
   end
 
   // Output
-  assign R = video_active ? {plasma_r} : 2'b00;
-  assign G = video_active ? {plasma_g} : 2'b00;
-  assign B = video_active ? {plasma_b} : 2'b00;
+  assign R = video_active ? (
+    is_inner ? 2'b11 :
+    is_border ? 2'b00 :
+    plasma_r
+  ) : 2'b00;
+  assign G = video_active ? (
+    is_inner ? 2'b11 :
+    is_border ? 2'b00 :
+    plasma_g
+  ) : 2'b00;
+  assign B = video_active ? (
+    is_inner ? 2'b11 :
+    is_border ? 2'b00 :
+    plasma_b
+  ) : 2'b00;
 
 endmodule

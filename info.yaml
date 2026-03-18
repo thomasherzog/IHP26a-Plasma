@@ -20,6 +20,7 @@ project:
     - "tt_um_plasmanim.sv"
     - "hvsync_generator.sv"
     - "plasma.sv"
+    - "text_renderer.sv"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
